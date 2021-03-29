@@ -56,7 +56,15 @@ export interface IThemeLoadResult {
 const THEME_PREFIX = 'dumi-theme-';
 const LOCAL_THEME_PATH = '.dumi/theme';
 const FALLBACK_THEME = `${THEME_PREFIX}default`;
-const REQUIRED_THEME_BUILTINS = ['Previewer', 'SourceCode', 'Alert', 'Badge', 'Example', 'API'];
+const REQUIRED_THEME_BUILTINS = [
+  'Alert',
+  'API',
+  'Badge',
+  'Example',
+  'Previewer',
+  'SourceCode',
+  'Tree',
+];
 let cache: IThemeLoadResult | null;
 
 /**
@@ -116,7 +124,7 @@ export default async () => {
     const modulePath = path.isAbsolute(theme)
       ? theme
       : // resolve real absolute path for theme package
-        winPath(path.dirname(getThemeResolvePath(theme)));
+      winPath(path.dirname(getThemeResolvePath(theme)));
     // local theme has no src directory but theme package has
     const srcPath = path.isAbsolute(theme) ? theme : `${modulePath}/src`;
     const builtinPath = pathJoin(srcPath, 'builtins');
@@ -125,17 +133,17 @@ export default async () => {
 
     const components = fs.existsSync(builtinPath)
       ? fs
-          .readdirSync(builtinPath)
-          .filter(file => /\.(j|t)sx?$/.test(file))
-          .map(file => ({
-            identifier: path.parse(file).name,
-            source: theme.startsWith('.')
-              ? // use abs path for relative theme folder
-                pathJoin(builtinPath, file)
-              : // still use module identifier rather than abs path for theme package and absolute theme folder
-                pathJoin(theme, builtinPath.replace(modulePath, ''), file),
-            modulePath: pathJoin(builtinPath, file),
-          }))
+        .readdirSync(builtinPath)
+        .filter(file => /\.(j|t)sx?$/.test(file))
+        .map(file => ({
+          identifier: path.parse(file).name,
+          source: theme.startsWith('.')
+            ? // use abs path for relative theme folder
+            pathJoin(builtinPath, file)
+            : // still use module identifier rather than abs path for theme package and absolute theme folder
+            pathJoin(theme, builtinPath.replace(modulePath, ''), file),
+          modulePath: pathJoin(builtinPath, file),
+        }))
       : [];
     const fallbacks = REQUIRED_THEME_BUILTINS.reduce((result, bName) => {
       if (components.every(({ identifier }) => identifier !== bName)) {
