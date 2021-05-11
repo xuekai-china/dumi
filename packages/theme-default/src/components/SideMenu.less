@@ -208,6 +208,10 @@
           color: @c-heading !important;
           background: transparent !important;
           cursor: default;
+
+          [data-prefers-color=dark] & {
+            color: @c-heading-dark !important;
+          }
         }
       }
 
